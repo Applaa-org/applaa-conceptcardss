@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Flashcard from '@/components/Flashcard';
 import { getConcepts, saveProgress, Concept } from '@/lib/api';
@@ -13,25 +13,27 @@ export default function Learn() {
   const [completed, setCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const data = await getConcepts();
-        if (data && data.length > 0) {
-          setConcepts(data.sort(() => Math.random() - 0.5));
-        } else {
-          setConcepts([]);
-        }
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load concepts. Please try again later.');
-      } finally {
-        setLoading(false);
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getConcepts();
+      if (data && data.length > 0) {
+        setConcepts(data.sort(() => Math.random() - 0.5));
+      } else {
+        setConcepts([]);
       }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load concepts. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleSwipe = async (status: 'learned' | 'review') => {
     if (!concepts[currentIndex]) return;
@@ -55,13 +57,18 @@ export default function Learn() {
     setCompleted(false);
     if (concepts.length > 0) {
       setConcepts([...concepts].sort(() => Math.random() - 0.5));
+    } else {
+      loadData();
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">Preparing your learning session...</p>
+        </div>
       </div>
     );
   }
@@ -77,14 +84,22 @@ export default function Learn() {
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">No Concepts Found</h2>
             <p className="text-slate-600 mb-8">
-              {error || "We couldn't find any concepts to learn right now. Please check back later."}
+              {error || "We couldn't find any concepts to learn right now. This might be due to a connection issue."}
             </p>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all"
-            >
-              Back to Home
-            </Link>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={loadData}
+                className="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all gap-2"
+              >
+                <RefreshCw className="w-4 h-4" /> Try Again
+              </button>
+              <Link
+                to="/"
+                className="text-slate-500 hover:text-slate-700 font-medium transition-colors"
+              >
+                Back to Home
+              </Link>
+            </div>
           </div>
         </main>
       </div>
@@ -98,7 +113,6 @@ export default function Learn() {
       <Header />
       
       <main className="flex-1 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-        {/* Progress Bar */}
         {!completed && (
           <div className="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
             <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">

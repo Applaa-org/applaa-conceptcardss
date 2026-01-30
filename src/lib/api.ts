@@ -1,8 +1,8 @@
 const API_URL = 'https://haix.ai/api';
 
-// Using the specific table names created in the database
-const CONCEPTS_TABLE = 'concepts_c8k2m1p9';
-const PROGRESS_TABLE = 'progress_c8k2m1p9';
+// Using the new v2 table names
+const CONCEPTS_TABLE = 'concepts_v2_9f2d8a1b';
+const PROGRESS_TABLE = 'progress_v2_9f2d8a1b';
 
 export interface Concept {
   id: number;
@@ -22,9 +22,15 @@ export interface Progress {
 }
 
 export async function getConcepts(): Promise<Concept[]> {
-  const response = await fetch(`${API_URL}/${CONCEPTS_TABLE}`);
-  if (!response.ok) throw new Error('Failed to fetch concepts');
-  return response.json();
+  try {
+    const response = await fetch(`${API_URL}/${CONCEPTS_TABLE}`);
+    if (!response.ok) throw new Error('Failed to fetch concepts');
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('API Error:', error);
+    return [];
+  }
 }
 
 export async function saveProgress(conceptId: number, status: 'learned' | 'review'): Promise<Progress> {
