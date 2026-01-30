@@ -6,12 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Trophy, RefreshCw, ChevronLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
-// Inlined fallback data to resolve TS2307 module error
 const FALLBACK_CONCEPTS: Concept[] = [
   {
     id: 999,
     title: "The James Webb Space Telescope",
     description: "The most powerful space telescope ever built, designed to solve mysteries in our solar system and beyond.",
+    detailed_info: "The James Webb Space Telescope (JWST) is an engineering marvel orbiting 1.5 million kilometers from Earth. Unlike Hubble, it primarily observes in the infrared spectrum, allowing it to peer through dense dust clouds to see the birth of stars and the very first galaxies formed after the Big Bang. Its primary mirror is 6.5 meters across, made of 18 hexagonal segments coated in a thin layer of gold to optimize infrared reflection.",
     example_image: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&q=80&w=800",
     category: "Science",
     difficulty: "Intermediate",
@@ -21,6 +21,7 @@ const FALLBACK_CONCEPTS: Concept[] = [
     id: 998,
     title: "The Silk Road",
     description: "A network of Eurasian trade routes active from the 2nd century BCE until the mid-15th century.",
+    detailed_info: "The Silk Road was not a single path but a vast network of land and sea routes connecting the East and West. While silk was a major trade item, the routes were equally important for the exchange of technologies (like paper-making and gunpowder), religions (Buddhism, Islam, Christianity), and even diseases (the Black Death). It laid the foundations for the modern globalized world.",
     example_image: "https://images.unsplash.com/photo-1523805081446-ed9a7bb8999a?auto=format&fit=crop&q=80&w=800",
     category: "History",
     difficulty: "Beginner",
@@ -30,6 +31,7 @@ const FALLBACK_CONCEPTS: Concept[] = [
     id: 997,
     title: "Neural Networks",
     description: "A method in artificial intelligence that teaches computers to process data in a way inspired by the human brain.",
+    detailed_info: "Neural networks consist of layers of interconnected 'neurons' that process information. Each connection has a 'weight' that adjusts as the network learns from data. Deep Learning refers to networks with many hidden layers. These systems excel at pattern recognition, enabling technologies like facial recognition, language translation, and autonomous driving.",
     example_image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
     category: "Computer Science",
     difficulty: "Advanced",
@@ -39,6 +41,7 @@ const FALLBACK_CONCEPTS: Concept[] = [
     id: 996,
     title: "The Fibonacci Sequence",
     description: "A series of numbers in which each number is the sum of the two preceding ones, often found in nature.",
+    detailed_info: "Starting with 0 and 1, the sequence goes 0, 1, 1, 2, 3, 5, 8, 13... The ratio between successive numbers (approx. 1.618) is known as the Golden Ratio. This pattern appears everywhere in nature: the spiral of a nautilus shell, the arrangement of pinecone scales, and the branching of trees, because it represents the most efficient way for organisms to grow.",
     example_image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=800",
     category: "Maths",
     difficulty: "Beginner",
@@ -48,6 +51,7 @@ const FALLBACK_CONCEPTS: Concept[] = [
     id: 995,
     title: "Photosynthesis",
     description: "The process by which green plants use sunlight to synthesize foods with the help of chlorophyll.",
+    detailed_info: "Photosynthesis occurs in the chloroplasts of plant cells. It takes carbon dioxide from the air and water from the soil, using light energy to convert them into glucose (sugar) and oxygen. This process is the primary source of energy for nearly all life on Earth and is responsible for maintaining the oxygen levels in our atmosphere.",
     example_image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&q=80&w=800",
     category: "Biology",
     difficulty: "Beginner",

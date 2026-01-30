@@ -1,6 +1,5 @@
 const API_URL = 'https://haix.ai/api';
 
-// Using a stable table name
 const CONCEPTS_TABLE = 'concepts_v3_final';
 const PROGRESS_TABLE = 'progress_v3_final';
 
@@ -8,6 +7,7 @@ export interface Concept {
   id: number;
   title: string;
   description: string;
+  detailed_info?: string; // New field for expanded information
   example_image: string;
   category: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
@@ -43,7 +43,6 @@ export async function saveProgress(conceptId: number, status: 'learned' | 'revie
     if (!response.ok) throw new Error('Failed to save progress');
     return response.json();
   } catch (error) {
-    console.warn('Could not save progress to DB, continuing locally');
     return { id: Math.random(), concept_id: conceptId, status, updated_at: new Date().toISOString() };
   }
 }
