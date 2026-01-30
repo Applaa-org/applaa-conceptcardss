@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import Flashcard from '@/components/Flashcard';
 import { getConcepts, saveProgress, Concept } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Trophy, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Loader2, Trophy, RefreshCw, ChevronLeft, AlertCircle } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
 export default function Learn() {
@@ -11,15 +11,21 @@ export default function Learn() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
+        setLoading(true);
         const data = await getConcepts();
-        // Randomize cards
-        setConcepts(data.sort(() => Math.random() - 0.5));
+        if (data && data.length > 0) {
+          setConcepts(data.sort(() => Math.random() - 0.5));
+        } else {
+          setConcepts([]);
+        }
       } catch (err) {
         console.error(err);
+        setError('Failed to load concepts. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -28,6 +34,8 @@ export default function Learn() {
   }, []);
 
   const handleSwipe = async (status: 'learned' | 'review') => {
+    if (!concepts[currentIndex]) return;
+    
     const currentConcept = concepts[currentIndex];
     try {
       await saveProgress(currentConcept.id, status);
@@ -45,7 +53,9 @@ export default function Learn() {
   const reset = () => {
     setCurrentIndex(0);
     setCompleted(false);
-    setConcepts([...concepts].sort(() => Math.random() - 0.5));
+    if (concepts.length > 0) {
+      setConcepts([...concepts].sort(() => Math.random() - 0.5));
+    }
   };
 
   if (loading) {
@@ -55,6 +65,33 @@ export default function Learn() {
       </div>
     );
   }
+
+  if (error || concepts.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center max-w-md p-8 bg-white rounded-3xl shadow-xl border border-slate-100">
+            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="text-rose-600 w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">No Concepts Found</h2>
+            <p className="text-slate-600 mb-8">
+              {error || "We couldn't find any concepts to learn right now. Please check back later."}
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all"
+            >
+              Back to Home
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const currentConcept = concepts[currentIndex];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -79,9 +116,9 @@ export default function Learn() {
         )}
 
         <AnimatePresence mode="wait">
-          {!completed ? (
+          {!completed && currentConcept ? (
             <motion.div
-              key={concepts[currentIndex].id}
+              key={currentConcept.id}
               initial={{ opacity: 0, x: 100, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -100, scale: 0.9 }}
@@ -89,11 +126,11 @@ export default function Learn() {
               className="w-full flex justify-center"
             >
               <Flashcard 
-                concept={concepts[currentIndex]} 
+                concept={currentConcept} 
                 onSwipe={handleSwipe} 
               />
             </motion.div>
-          ) : (
+          ) : completed ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -121,7 +158,7 @@ export default function Learn() {
                 </Link>
               </div>
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </main>
     </div>
