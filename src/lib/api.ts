@@ -1,9 +1,8 @@
 const API_URL = 'https://haix.ai/api';
 
-// Unique random string for this app
-const APP_ID = 'c8k2m1p9';
-export const CONCEPTS_TABLE = `concepts_${APP_ID}`;
-export const PROGRESS_TABLE = `progress_${APP_ID}`;
+// Using the specific table names created in the database
+const CONCEPTS_TABLE = 'concepts_c8k2m1p9';
+const PROGRESS_TABLE = 'progress_c8k2m1p9';
 
 export interface Concept {
   id: number;
@@ -35,5 +34,11 @@ export async function saveProgress(conceptId: number, status: 'learned' | 'revie
     body: JSON.stringify({ concept_id: conceptId, status }),
   });
   if (!response.ok) throw new Error('Failed to save progress');
+  return response.json();
+}
+
+export async function getProgress(): Promise<Progress[]> {
+  const response = await fetch(`${API_URL}/${PROGRESS_TABLE}`);
+  if (!response.ok) throw new Error('Failed to fetch progress');
   return response.json();
 }
